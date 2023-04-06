@@ -2,8 +2,9 @@
   <div class="app">
     <NavBar />
     <CountriesList />
+    <router-view></router-view>
     <CountryDetails 
-    :country="countrySelected[0]"/>
+    :country="countrySelected"/>
 
   </div>
 
@@ -19,7 +20,7 @@
     data() {
       return {
       countryID: '',
-      countrySelected: [],
+      countrySelected: '',
       arrCountriesFiltered: [],
       }
     },
@@ -43,6 +44,12 @@
     );
    },
     methods: {
+      _getParams(){
+        const newURL = this.$route.params
+        this.countryID = newURL.alpha3Code;
+        return this.countryID
+      },
+
       async _getCountriesData(){
         const response = await fetch(
           'https://ih-countries-api.herokuapp.com/countries')
@@ -55,6 +62,7 @@
         const cleanCountry = this._filterObject(eachCountry)
         this.arrCountriesFiltered.push(cleanCountry)
         })
+        this._filterWithURL(this.arrCountriesFiltered)
         console.log(this.arrCountriesFiltered)
       },
 
@@ -62,24 +70,20 @@
         const {name, alpha3Code, capital, area, borders} = object;
         const nameFiltered = name.common
         const objectFiltered = {nameFiltered, alpha3Code, capital, area, borders}
-
         return objectFiltered
       },
-      _getParams(){
-        const newURL = this.$route.params
-        this.countryID = newURL.alpha3Code;
 
-        console.log(newURL)
-        console.log(`esto es el alpha3code desde APP ${this.countryID}`)
-        return this.countryID
-      },
       _filterWithURL(array){
-      if (this.countrySelected[0] == undefined) {
-          this.countrySelected = [{name:'example'}]
+        const countryWatched = array.filter((eachCountry) => eachCountry.alpha3Code === this.countryID)
+
+        if (this.countrySelected === '' && this.countryID == undefined) {
+       this.countrySelected = {nameFiltered:'example city'}
+       console.log(this.countryID)
         }
+
         else { 
-        this.countrySelected = array.filter((eachCountry) => eachCountry.alpha3Code === this.countryID)
-        console.log(this.countrySelected[0])}
+        this.countrySelected = countryWatched[0]
+        console.log(this.countrySelected)}
          }
     }
 
