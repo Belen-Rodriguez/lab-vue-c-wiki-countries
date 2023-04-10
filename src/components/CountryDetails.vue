@@ -8,9 +8,9 @@
       <!-- Country Details (Bootstrap column) -->
       <div class="col-7">
         <img
-          src="https://restcountries.eu/data/fra.svg"
+          :src="`https://flagpedia.net/data/flags/icon/72x54/${country.alpha2Code.toLowerCase()}.png`"
           alt="country flag"
-          style="width: 300px"
+          style="width: 100px"
         />
         <h1>{{ country.nameFiltered }}</h1>
         <table class="table">

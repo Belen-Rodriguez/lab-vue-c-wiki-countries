@@ -1,10 +1,13 @@
 <template>
   <div class="app">
     <NavBar />
-    <CountriesList />
+  <div class="countiesContainer">
+    <CountriesList 
+    :countriesData="arrCountriesNoFiltered"/>
     <router-view></router-view>
     <CountryDetails 
     :country="countrySelected"/>
+  </div>
 
   </div>
 
@@ -22,6 +25,7 @@
       countryID: '',
       countrySelected: '',
       arrCountriesFiltered: [],
+      arrCountriesNoFiltered: [],
       }
     },
     components: {
@@ -52,39 +56,50 @@
 
       async _getCountriesData(){
         const response = await fetch(
-          'https://ih-countries-api.herokuapp.com/countries')
-        const data = await response.json()
-        this._filteredArray(data)
+          'https://ih-countries-api.herokuapp.com/countries');
+        const data = await response.json();
+        console.log(data);
+        this._filteredArray(data);
+        this.arrCountriesNoFiltered = data
+        return this.arrCountriesNoFiltered
       },
       
       _filteredArray(arrayJson){
         arrayJson.forEach(eachCountry => {
-        const cleanCountry = this._filterObject(eachCountry)
-        this.arrCountriesFiltered.push(cleanCountry)
+        const cleanCountry = this._filterObject(eachCountry);
+        this.arrCountriesFiltered.push(cleanCountry);
         })
-        this._filterWithURL(this.arrCountriesFiltered)
+
         console.log(this.arrCountriesFiltered)
+        this._filterWithURL(this.arrCountriesFiltered)
+
       },
 
       _filterObject(object){
-        const {name, alpha3Code, capital, area, borders} = object;
+        const {name, alpha3Code, capital, area, borders, alpha2Code} = object;
         const nameFiltered = name.common
-        const objectFiltered = {nameFiltered, alpha3Code, capital, area, borders}
+        const objectFiltered = {nameFiltered, alpha3Code, capital, area, borders, alpha2Code}
         return objectFiltered
       },
 
       _filterWithURL(array){
         const countryWatched = array.filter((eachCountry) => eachCountry.alpha3Code === this.countryID)
 
-        if (this.countrySelected === '' && this.countryID == undefined) {
-       this.countrySelected = {nameFiltered:'example city'}
+       if (this.countrySelected === '' && this.countryID == undefined) {
+       this.countrySelected = 
+       {nameFiltered:'France',
+       capital:['Paris'],
+       area:'551695',
+       borders: 
+       ['AND', 'BEL', 'DEU', 'ITA', 'LUX', 'MCO', 'ESP', 'CHE'],
+       alpha2Code:'FR',
+      }
        console.log(this.countryID)
-        }
-
-        else { 
+       }
+       else { 
         this.countrySelected = countryWatched[0]
         console.log(this.countrySelected)}
-         }
+      }
     }
 
 
@@ -94,6 +109,9 @@
 
 </script>
 
-<style>
-
+<style scoped>
+.countriesContainer{
+  display: flex;
+  flex-direction: column;
+}
 </style>
